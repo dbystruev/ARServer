@@ -1,0 +1,3 @@
+.build/							usr/src/2019.10.28ARKitura
+terraform/scripts/install.sh	usr/src/2019.10.28ARKitura
+terraform/scripts/start.sh		usr/src/2019.10.28ARKitura

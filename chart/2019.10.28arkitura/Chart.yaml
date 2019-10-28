@@ -1,0 +1,4 @@
+apiVersion: v1
+description: A Helm chart for Kubernetes
+name: 2019.10.28arkitura
+version: 1.0.0

@@ -1,0 +1,9 @@
+---
+applications:
+- instances: 1
+  timeout: 180
+  name: 2019.10.28ARKitura
+  buildpack: swift_buildpack
+  command: '2019.10.28ARKitura'
+  memory: 128M
+  random-route: true

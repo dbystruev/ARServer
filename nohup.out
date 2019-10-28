@@ -1,0 +1,6 @@
+[1/2] Compiling Application Application.swift
+[2/3] Merging module Application
+[3/3] Linking 2019.10.28ARKitura
+[Mon Oct 28 21:05:02 2019] com.ibm.diagnostics.healthcenter.loader INFO: Swift Application Metrics
+[2019-10-28T21:05:02.463+03:00] [INFO] [Metrics.swift:24 initializeMetrics(router:)] Initialized metrics.
+[2019-10-28T21:05:02.468+03:00] [INFO] [HTTPServer.swift:244 listen(_:)] Listening on port 9000
