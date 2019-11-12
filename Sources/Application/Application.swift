@@ -33,6 +33,18 @@ public class App {
         initializeMetrics(router: router)
     }
     
+    func logError(
+        line: Int = #line,
+        function: String = #function,
+        file: String = #file,
+        _ message: String,
+        _ error: Error
+    ) {
+        Log.error(
+            "\(line) \(function) ERROR: \(message): \(error.localizedDescription)"
+        )
+    }
+    
     func postInit() throws {
         // Set Stencil as template engine
         router.setDefault(templateEngine: StencilTemplateEngine())
@@ -40,17 +52,14 @@ public class App {
         // Endpoints
         initializeHealthRoutes(app: self)
         
-        print(#line, #function)
-        
         router.all("/pikachu", middleware: StaticFileServer(path: "\(rootDirectoryPath)/public/Pikachu"))
-        
-        print(#line, #function)
         
         router.all("/originals", middleware: StaticFileServer(path: originalsDirectory.path))
         
-        print(#line, #function)
-        
         router.get("/public*") { request, response, next in
+            
+            Log.debug("\(#line) \(#function)")
+        
             defer { next() }
             
             let fileManager = FileManager()
@@ -62,6 +71,66 @@ public class App {
             ) else { return }
             
             try response.render("list", context: ["files": files.map { $0.lastPathComponent }])
+        }
+        
+        router.all("/upload", middleware: BodyParser())
+        router.post("/upload") { request, response, next in
+            
+            func createThumbnail(_ url: URL) -> Data? {
+                return nil
+            }
+            
+            defer { next() }
+ 
+            Log.debug("\(#line) \(#function) \(request.queryParameters)")
+            
+            guard let values = request.body else { return }
+            
+            Log.debug("\(#line) \(#function)")
+            
+            guard case .multipart(let parts) = values else { return }
+            
+            let acceptableTypes = [
+                "image/png",
+                "image/jpeg",
+                "model/vnd.pixar.usd",
+                "model/usd",
+            ]
+            
+            for part in parts {
+                Log.debug("\(#line) \(#function)")
+                
+                guard acceptableTypes.contains(part.type) else { continue }
+                
+                Log.debug("\(#line) \(#function) \(part.type)")
+                
+                guard case .raw(let data) = part.body else { continue }
+                
+                let cleanedFilename = part.filename.replacingOccurrences(
+                    of: " ",
+                    with: "_"
+                )
+                
+                let newURL = self.originalsDirectory.appendingPathComponent(cleanedFilename)
+                
+                do {
+                    try data.write(to: newURL)
+                    
+                    let thumbsURL = self.thumbsDirectory.appendingPathComponent(cleanedFilename)
+                    
+                    if let image = createThumbnail(newURL) {
+                        do {
+                            try image.write(to: thumbsURL)
+                        } catch let error {
+                            self.logError("writing thumbnail file \(thumbsURL)", error)
+                        }
+                    }
+                } catch let error {
+                    self.logError("writing original file \(newURL)", error)
+                }
+            }
+            
+            try response.redirect("/public")
         }
     }
     

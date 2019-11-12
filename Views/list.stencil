@@ -12,4 +12,11 @@
 {% empty %}
 <p>No files uploaded</p>
 {% endfor %}
+
+<form action="/upload"
+    enctype="multipart/form-data"
+    method="POST">
+<p><input type="file" name="upload" multiple/></p>
+<p><button type="submit" class="btn">Upload</button></p>
+</form>
 {% endblock %}
